@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Karthik's Unblocker</title>
+    <title>Karthik's Unblocker V2</title>
     <style>
         body {
             background-color: #121212;
@@ -25,8 +25,9 @@
         .input-group {
             display: flex;
             gap: 10px;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
             justify-content: center;
+            flex-wrap: wrap;
         }
         input {
             padding: 12px;
@@ -34,8 +35,17 @@
             border: 1px solid #333;
             background: #222;
             color: white;
-            width: 70%;
+            width: 60%;
             font-size: 16px;
+        }
+        select {
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid #333;
+            background: #222;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
         }
         button {
             padding: 12px 24px;
@@ -56,7 +66,8 @@
             background: #000;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            display: none; /* Hidden until video loads */
+            display: none; 
+            margin-top: 20px;
         }
         iframe {
             position: absolute;
@@ -71,11 +82,18 @@
 <body>
 
     <div class="container">
-        <h1>Karthik's Player</h1>
-        <p>Paste any YouTube link below to watch it unblocked.</p>
+        <h1>Karthik's Player V2</h1>
+        <p>Paste any YouTube link to watch unblocked.</p>
         
         <div class="input-group">
-            <input type="text" id="ytLink" placeholder="Paste YouTube Link here (e.g. https://youtu.be/...)" />
+            <select id="serverSelect">
+                <option value="https://yewtu.be">Server 1 (Yewtu.be)</option>
+                <option value="https://invidious.drgns.club">Server 2 (Drgns)</option>
+                <option value="https://inv.tux.pizza">Server 3 (Tux)</option>
+                <option value="https://piped.video">Server 4 (Piped)</option>
+            </select>
+            
+            <input type="text" id="ytLink" placeholder="Paste YouTube Link here..." />
             <button onclick="playVideo()">Watch</button>
         </div>
 
@@ -87,19 +105,27 @@
     <script>
         function playVideo() {
             const input = document.getElementById('ytLink').value;
+            const server = document.getElementById('serverSelect').value;
             const playerBox = document.getElementById('playerBox');
             const videoFrame = document.getElementById('videoFrame');
             
-            // Extract Video ID from various YouTube URL formats
+            // Extract Video ID
             let videoId = '';
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
             const match = input.match(regExp);
 
             if (match && match[2].length === 11) {
                 videoId = match[2];
-                // THE SECRET: We load the video from inv.nadeko.net instead of youtube.com
-                // This bypasses the Sophos firewall because it trusts Nadeko.
-                videoFrame.src = `https://inv.nadeko.net/embed/${videoId}?autoplay=1`;
+                
+                // Construct the URL based on the chosen server
+                if (server.includes('piped')) {
+                    // Piped uses a slightly different embed format
+                    videoFrame.src = `${server}/embed/${videoId}?autoplay=1`;
+                } else {
+                    // Invidious format
+                    videoFrame.src = `${server}/embed/${videoId}?autoplay=1`;
+                }
+                
                 playerBox.style.display = "block";
             } else {
                 alert("Please enter a valid YouTube URL");
